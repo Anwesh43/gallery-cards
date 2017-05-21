@@ -6,6 +6,7 @@ class Gallery {
         this.img.style.top = y
         this.cards = []
         this.x = 0
+        document.body.appendChild(this.img)
     }
     draw() {
         const w = this.canvas.width ,h = this.canvas.height
@@ -45,5 +46,43 @@ class Card {
             context.restore()
         }
 
+    }
+}
+class ArrowButton {
+    constructor(x,y,dir,cb) {
+        this.x = x
+        this.y = y
+        this.dir = dir
+        this.img = document.createElement('img')
+        document.body.appendChild(this.img)
+        this.img.onmousedown = () => {
+            this.cb(this.dir)
+        }
+    }
+    render() {
+        const canvas = document.createElement('canvas')
+        canvas.width = window.innerWidth/10
+        canvas.height = window.innerWidth/10
+        const size = canvas.width/3
+        const context = canvas.getContext('2d')
+        context.save()
+        context.translate(canvas.width/2,canvas.height/2)
+        if(this.dir == 1){
+            context.rotate(0)
+        }
+        else {
+            context.rotate(Math.PI)
+        }
+        context.lineWidth = size/5
+        for(var i=0;i<2;i++) {
+            context.save()
+            context.rotate(-45+90*i)
+            context.beginPath()
+            context.moveTo(0,0)
+            context.lineTo(-size,0)
+            context.stroke()
+            context.restore()
+        }
+        context.restore()
     }
 }
