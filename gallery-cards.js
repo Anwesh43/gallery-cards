@@ -21,6 +21,12 @@ class Gallery {
         })
         this.context.restore()
         this.img.src = this.canvas.toDataURL()
+        if(this.cards[0].imageLoaded == false) {
+            setTimeout(()=>{
+                this.draw()
+            },500)
+
+        }
     }
     render() {
         if(!this.isAnimated) {
@@ -52,11 +58,11 @@ class Gallery {
         //console.log(this.w)
         this.draw()
         const leftArrowButton = new ArrowButton(parseFloat(this.img.style.left)-this.w/2,parseFloat(this.img.style.top)+this.w/2,-1,(dir)=>{
-            if(this.x > -this.w*this.cards.length-1) {
+            if(this.x > -this.w*(this.cards.length-1)) {
                 this.startRendering(dir)
             }
         })
-        const rightArrowButton = new ArrowButton(parseFloat(this.img.style.left)+(6*this.w)/5,parseFloat(this.img.style.top)+this.w/2,1,(dir)=>{
+        const rightArrowButton = new ArrowButton(parseFloat(this.img.style.left)+(11*this.w)/10,parseFloat(this.img.style.top)+this.w/2,1,(dir)=>{
             if(this.x < 0) {
                 this.startRendering(dir)
             }
@@ -74,27 +80,23 @@ class Card {
         this.imageLoaded = false
         this.image = new Image()
         this.src = src
+        this.image.src = this.src
+        this.image.onload = ()=>{
+            this.imageLoaded = true
+            //console.log("loading")
+            //this.draw(context,w,h)
+        }
     }
     draw(context,w,h) {
-        if(this.imageLoaded == false) {
-            this.image.src = this.src
-            this.image.onload = ()=>{
-                this.imageLoaded = true
-                //console.log("loading")
-                //this.draw(context,w,h)
-                this.draw(context,w,h)
-            }
-        }
-        else {
-          //console.log(this.x)
-          context.fillStyle = '#BDBDBD'
-          context.save()
-          context.translate(this.x,0)
-          context.fillRect(0,0,w,h)
-          context.fillStyle = 'red'
-          context.fillRect(w/10,h/10,4*w/5,4*h/5)
-          context.drawImage(this.image,w/10,h/10,4*w/5,4*h/5)
-          context.restore()
+        if(this.imageLoaded == true) {
+            context.fillStyle = '#BDBDBD'
+            context.save()
+            context.translate(this.x,0)
+            context.fillRect(0,0,w,h)
+            // context.fillStyle = 'red'
+            // context.fillRect()
+            context.drawImage(this.image,w/20,h/20,0.9*w,0.9*h)
+            context.restore()
         }
 
     }
