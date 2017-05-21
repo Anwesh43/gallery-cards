@@ -49,14 +49,14 @@ class Gallery {
         this.canvas.width = this.w
         this.canvas.height = this.w
         this.context = this.canvas.getContext('2d')
-        console.log(this.w)
+        //console.log(this.w)
         this.draw()
-        const leftArrowButton = new ArrowButton(parseFloat(this.img.style.left)-this.w/5,this.w/2,-1,(dir)=>{
+        const leftArrowButton = new ArrowButton(parseFloat(this.img.style.left)-this.w/2,parseFloat(this.img.style.top)+this.w/2,-1,(dir)=>{
             if(this.x > -this.w*this.cards.length-1) {
                 this.startRendering(dir)
             }
         })
-        const rightArrowButton = new ArrowButton(parseFloat(this.img.style.left)+(6*this.w)/5,this.w/2,1,(dir)=>{
+        const rightArrowButton = new ArrowButton(parseFloat(this.img.style.left)+(6*this.w)/5,parseFloat(this.img.style.top)+this.w/2,1,(dir)=>{
             if(this.x < 0) {
                 this.startRendering(dir)
             }
@@ -80,11 +80,13 @@ class Card {
             this.image.src = this.src
             this.image.onload = ()=>{
                 this.imageLoaded = true
+                //console.log("loading")
+                //this.draw(context,w,h)
                 this.draw(context,w,h)
             }
         }
         else {
-          console.log(this.x)
+          //console.log(this.x)
           context.fillStyle = '#BDBDBD'
           context.save()
           context.translate(this.x,0)
@@ -118,6 +120,8 @@ class ArrowButton {
         const size = canvas.width/3
         const context = canvas.getContext('2d')
         context.strokeStyle = 'black'
+        context.lineJoin = 'round'
+        context.lineCap = 'round'
         context.fillStyle = '#BDBDBD'
         context.save()
         context.translate(canvas.width/2,canvas.height/2)
