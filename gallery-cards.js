@@ -4,23 +4,58 @@ class Gallery {
         this.img.style.position = 'absolute'
         this.img.style.left = x
         this.img.style.top = y
+        this.isAnimated = false
         this.cards = []
         this.x = 0
+        this.w = window.innerWidth/4
         document.body.appendChild(this.img)
+        this.dir = 0
     }
     draw() {
         const w = this.canvas.width ,h = this.canvas.height
         this.context.clearRect(0,0,w,h)
         this.context.fillStyle = '#BDBDBD'
         this.context.fillRect(0,0,w,h)
+        this.cards.forEach((card)=>{
+            card.draw(this.context)
+        })
         this.img.src = this.canvas.toDataURL()
+    }
+    render() {
+        if(!this.isAnimated) {
+            this.isAnimated = true
+            const initX = this.x
+            const interval = setInterval(()=>{
+                this.draw()
+                this.x += this.dir * this.w/5
+                if(Math.abs(this.x-initX) >= w) {
+                    this.dir = 0
+                    clearInterval(interval)
+                    this.isAnimated = false
+                }
+            },100)
+        }
+    }
+    startRendering(dir) {
+        this.dir = dir
+        this.render()
     }
     create() {
         this.canvas = document.createElement('canvas')
-        this.canvas.width = window.innerWidth/4
-        this.canvas.height = window.innerHeight/3
+        this.canvas.width = this.w
+        this.canvas.height = this.w
         this.context = this.canvas.getContext('2d')
         this.draw()
+        const leftArrowButton = new ArrowButton(this.x-this.w/5,this.w/2,-1,(dir)=>{
+            if(this.x > -this.w*this.cards.length-1) {
+                this.startRendering(dir)
+            }
+        })
+        const rightArrowButton = new ArrowButton(this.x+(6*this.w)/5,this.w/2,1,(dir)=>{
+            if(this.x < 0) {
+                this.startRendering(dir)
+            }
+        })
     }
     addCard(src) {
         this.cards.push(new Card(src,this.cards.length*window.innerWidth/4))
