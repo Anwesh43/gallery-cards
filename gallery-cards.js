@@ -56,6 +56,8 @@ class Gallery {
                 this.startRendering(dir)
             }
         })
+        leftArrowButton.render()
+        rightArrowButton.render()
     }
     addCard(src) {
         this.cards.push(new Card(src,this.cards.length*window.innerWidth/4))
@@ -100,8 +102,13 @@ class ArrowButton {
         canvas.height = window.innerWidth/10
         const size = canvas.width/3
         const context = canvas.getContext('2d')
+        context.strokeStyle = 'black'
+        context.fillStyle = '#BDBDBD'
         context.save()
         context.translate(canvas.width/2,canvas.height/2)
+        context.beginPath()
+        context.arc(0,0,canvas.width/2,0,2*Math.PI)
+        context.fill()
         if(this.dir == 1){
             context.rotate(0)
         }
@@ -119,5 +126,6 @@ class ArrowButton {
             context.restore()
         }
         context.restore()
+        this.img.src = canvas.toDataURL()
     }
 }
