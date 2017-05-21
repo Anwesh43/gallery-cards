@@ -1,9 +1,9 @@
 class Gallery {
     constructor(x,y) {
-        this.img = document.createElement('canvas')
+        this.img = document.createElement('img')
         this.img.style.position = 'absolute'
-        this.img.style.left = x
-        this.img.style.top = y
+        this.img.style.left = x+window.innerWidth/10
+        this.img.style.top = y+window.innerHeight/10
         this.isAnimated = false
         this.cards = []
         this.x = 0
@@ -12,13 +12,14 @@ class Gallery {
         this.dir = 0
     }
     draw() {
-        const w = this.canvas.width ,h = this.canvas.height
-        this.context.clearRect(0,0,w,h)
-        this.context.fillStyle = '#BDBDBD'
-        this.context.fillRect(0,0,w,h)
+        const h = this.canvas.height
+        this.context.clearRect(0,0,this.w,h)
+        this.context.save()
+        this.context.translate(this.x,0)
         this.cards.forEach((card)=>{
-            card.draw(this.context)
+            card.draw(this.context,this.w,h)
         })
+        this.context.restore()
         this.img.src = this.canvas.toDataURL()
     }
     render() {
@@ -28,8 +29,11 @@ class Gallery {
             const interval = setInterval(()=>{
                 this.draw()
                 this.x += this.dir * this.w/5
-                if(Math.abs(this.x-initX) >= w) {
+                if(Math.abs(this.x-initX) > this.w) {
+
+                    this.x = initX +this.dir*this.w
                     this.dir = 0
+                    this.draw()
                     clearInterval(interval)
                     this.isAnimated = false
                 }
@@ -45,13 +49,14 @@ class Gallery {
         this.canvas.width = this.w
         this.canvas.height = this.w
         this.context = this.canvas.getContext('2d')
+        console.log(this.w)
         this.draw()
-        const leftArrowButton = new ArrowButton(this.x-this.w/5,this.w/2,-1,(dir)=>{
+        const leftArrowButton = new ArrowButton(parseFloat(this.img.style.left)-this.w/5,this.w/2,-1,(dir)=>{
             if(this.x > -this.w*this.cards.length-1) {
                 this.startRendering(dir)
             }
         })
-        const rightArrowButton = new ArrowButton(this.x+(6*this.w)/5,this.w/2,1,(dir)=>{
+        const rightArrowButton = new ArrowButton(parseFloat(this.img.style.left)+(6*this.w)/5,this.w/2,1,(dir)=>{
             if(this.x < 0) {
                 this.startRendering(dir)
             }
@@ -60,7 +65,7 @@ class Gallery {
         rightArrowButton.render()
     }
     addCard(src) {
-        this.cards.push(new Card(src,this.cards.length*window.innerWidth/4))
+        this.cards.push(new Card(src,this.cards.length*this.w))
     }
 }
 class Card {
@@ -68,30 +73,40 @@ class Card {
         this.x = x
         this.imageLoaded = false
         this.image = new Image()
-        this.image.src = src
-        this.image.onload = ()=>{
-            this.imageLoaded = true
-        }
+        this.src = src
     }
     draw(context,w,h) {
-        if(this.imageLoaded) {
-            context.fillStyle = 'white'
-            context.save()
-            context.translate(this.x,0)
-            context.fillRect(0,0,w,h)
-            context.drawImage(this.image,w/10,h/10,4*w/5,4*h/5)
-            context.restore()
+        if(this.imageLoaded == false) {
+            this.image.src = this.src
+            this.image.onload = ()=>{
+                this.imageLoaded = true
+                this.draw(context,w,h)
+            }
+        }
+        else {
+          console.log(this.x)
+          context.fillStyle = '#BDBDBD'
+          context.save()
+          context.translate(this.x,0)
+          context.fillRect(0,0,w,h)
+          context.fillStyle = 'red'
+          context.fillRect(w/10,h/10,4*w/5,4*h/5)
+          context.drawImage(this.image,w/10,h/10,4*w/5,4*h/5)
+          context.restore()
         }
 
     }
 }
 class ArrowButton {
     constructor(x,y,dir,cb) {
-        this.x = x
-        this.y = y
         this.dir = dir
         this.img = document.createElement('img')
+        this.img.style.position = 'absolute'
+        this.img.style.left = x
+        this.img.style.top = y
+
         document.body.appendChild(this.img)
+        this.cb = cb
         this.img.onmousedown = () => {
             this.cb(this.dir)
         }
